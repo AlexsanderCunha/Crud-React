@@ -22,7 +22,7 @@ const ModalComp = ({ data, saveContact, dataEdit, isOpen, onClose, updateContact
 
     const handleSave = () => {
         if (!name || !email || !phone) return;
-        if(!validateEmail(email)) return alert("E-mail invalido!!")
+        if(!validateEmail(email)) return alert("E-mail invalido!")
         if (dataEdit?.id) {
             updateContact({ id: dataEdit?.id, name: name, email: email, phone: phone })
             onClose();

@@ -82,7 +82,7 @@ const App = () => {
       getContacts()
     } catch (error) {
       console.error(error);
-      alert("Houve um erro ao delete contato!!")
+      alert("Houve um erro ao delete contato!")
     }
   };
 
