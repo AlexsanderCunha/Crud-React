@@ -12,9 +12,9 @@ import {
   Td,
   useBreakpointValue,
 } from "@chakra-ui/react";
+import axios  from "axios";
 import { useEffect, useState } from "react";
 import ModalComp from "./components/ModalComp";
-
 
 const App = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -27,19 +27,63 @@ const App = () => {
   });
 
   useEffect(() => {
-    const db_costumer = localStorage.getItem("cad_usuario")
-      ? JSON.parse(localStorage.getItem("cad_usuario"))
-      : [];
-
-    setData(db_costumer);
+    getContacts()
   }, [setData]);
 
-  const handleRemove = (email) => {
-    const newArray = data.filter((item) => item.email !== email);
+  async function getContacts() {
+    try {
+      const response = await axios.get('http://localhost:8080/contacts', {
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        }
+      });
+      setData(response.data)
+    } catch (error) {
+      console.error(error);
+      alert("Houve um erro ao buscar contatos!!")
+    }
+  }
 
-    setData(newArray);
+  async function saveContact(dataEdit){
+    try {
+        await axios.post('http://localhost:8080/contacts', dataEdit, {
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        }
+      });
+      getContacts()
+    } catch (error) {
+      console.error(error);
+      alert("Houve um erro ao salvar contato!")
+    }
+  }
 
-    localStorage.setItem("cad_usuario", JSON.stringify(newArray));
+  async function updateContact(dataEdit){
+    try {
+        await axios.put(`http://localhost:8080/contacts/${dataEdit.id}`, dataEdit, {
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        }
+      });
+      getContacts()
+    } catch (error) {
+      console.error(error);
+      alert("Houve um erro ao atualizar!!")
+    }
+  }
+
+  async function handleRemoveContact(id){
+    try {
+       await axios.delete(`http://localhost:8080/contacts/${id}`, {
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        }
+      });
+      getContacts()
+    } catch (error) {
+      console.error(error);
+      alert("Houve um erro ao delete contato!!")
+    }
   };
 
   return (
@@ -64,20 +108,24 @@ const App = () => {
                   <Th maxW={isMobile ? 5 : 100} fontSize="20px">
                     E-Mail
                   </Th>
+                  <Th maxW={isMobile ? 5 : 100} fontSize="20px">
+                    Telefone
+                  </Th>
                   <Th p={0}></Th>
                   <Th p={0}></Th>
               </Tr>
             </Thead>
             <Tbody>
-              {data.map(({ name, email }, index) => (
+              {data.map(({ id, name, email, phone }, index) => (
                 <Tr key={index} cursor="pointer " _hover={{ bg: "gray.100" }}>
                   <Td maxW={isMobile ? 5 : 100}>{name}</Td>
                   <Td maxW={isMobile ? 5 : 100}>{email}</Td>
+                  <Td maxW={isMobile ? 5 : 100}>{phone}</Td>
                   <Td p={0}>
                     <EditIcon
                       fontSize={20}
                       onClick={() => [
-                        setDataEdit({ name, email, index }),
+                        setDataEdit({ id, name, email, phone }),
                         onOpen(),
                       ]}
                     />
@@ -85,7 +133,7 @@ const App = () => {
                   <Td p={0}>
                     <DeleteIcon
                       fontSize={20}
-                      onClick={() => handleRemove(email)}
+                      onClick={() => handleRemoveContact(id)}
                     />
                   </Td>
                 </Tr>
@@ -99,7 +147,8 @@ const App = () => {
           isOpen={isOpen}
           onClose={onClose}
           data={data}
-          setData={setData}
+          saveContact={saveContact}
+          updateContact={updateContact}
           dataEdit={dataEdit}
           setDataEdit={setDataEdit}
         />
