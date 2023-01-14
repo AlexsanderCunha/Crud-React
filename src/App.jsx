@@ -12,7 +12,7 @@ import {
   Td,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import axios  from "axios";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import ModalComp from "./components/ModalComp";
 
@@ -40,7 +40,7 @@ const App = () => {
       setData(response.data)
     } catch (error) {
       console.error(error);
-      alert("Houve um erro ao buscar contatos!!")
+      alert("Houve um erro ao buscar contatos!")
     }
   }
 
